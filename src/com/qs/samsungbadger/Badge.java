@@ -54,7 +54,7 @@ public final class Badge implements BadgeColumns, Parcelable {
      * @return true if badge instance is saved, false otherwise.
      */
     private boolean isSaved() {
-        return mId <= 0;
+        return mId > 0;
     }
 
     /**
