@@ -14,11 +14,6 @@ EXAMPLES
     <uses-permission android:name="com.sec.android.provider.badge.permission.WRITE" />
 
 
-**The column structure is as follows:**
-
-    (integer) _id, (text) package, (text) class, (integer) badgecount, (blob) icon
-
-
 **To return the Badge instance for your application:**
 
     Context context = getApplicationContext();
