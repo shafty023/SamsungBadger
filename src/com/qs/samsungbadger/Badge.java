@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 interface BadgeColumns {
     public static final String ID = "_id";
@@ -79,25 +80,25 @@ public final class Badge implements BadgeColumns, Parcelable {
      * @return true if badging is supported, false otherwise
      */
     public static boolean isBadgingSupported(Context context) {
-	    Preferences prefs = Preferences.getPreferences(context);
-	    final int isSupported = prefs.getIsBadgingSupported();
+        Preferences prefs = Preferences.getPreferences(context);
+        final int isSupported = prefs.getIsBadgingSupported();
 
-	    // This indicates we haven't checked before so check now
-	    if (isSupported == -1) {
-	        Cursor c = context.getContentResolver().query(CONTENT_URI,
-	    		    null, null, null, null);
+        // This indicates we haven't checked before so check now
+        if (isSupported == -1) {
+            Cursor c = context.getContentResolver().query(CONTENT_URI,
+                    null, null, null, null);
 
-	        if (c == null) {
-	            prefs.setIsBadgingSupported(false);
-	            return false;
-	        } else {
-	            c.close();
-	            return true;
-	        }
-	    } else {
-	        return isSupported == 1;
-	    }
-	}
+            if (c == null) {
+                prefs.setIsBadgingSupported(false);
+                return false;
+            } else {
+                c.close();
+                return true;
+            }
+        } else {
+            return isSupported == 1;
+        }
+    }
 
     /**
      * Returns the badge associated with our application.<br>
@@ -165,8 +166,8 @@ public final class Badge implements BadgeColumns, Parcelable {
     public void setIcon(Drawable icon) {
         if (icon == null) return;
 
-    	BitmapDrawable bitDw = ((BitmapDrawable) icon);
-    	setIcon(bitDw.getBitmap());
+        BitmapDrawable bitDw = ((BitmapDrawable) icon);
+        setIcon(bitDw.getBitmap());
     }
 
     /**
@@ -211,6 +212,40 @@ public final class Badge implements BadgeColumns, Parcelable {
         final int rows = context.getContentResolver().update(mBaseUri,
             toContentValues(), null, null);
         return rows > 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof Badge)) return false;
+
+        Badge b = (Badge)o;
+        if (mId != b.mId) return false;
+        if (!TextUtils.equals(mPackage, b.mPackage)) return false;
+        if (!TextUtils.equals(mClass, b.mClass)) return false;
+        if (mBadgeCount != b.mBadgeCount) return false;
+        if (mIcon != b.mIcon) return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = (31 * result + (int)(mId ^ (mId >>>32)));
+        result = (31 * result + (mPackage == null ? 0 : mPackage.hashCode()));
+        result = (31 * result + (mClass == null ? 0 : mClass.hashCode()));
+        result = (31 * result + mBadgeCount);
+        result = (31 * result + (mIcon == null ? 0 : mIcon.hashCode()));
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return BadgeColumns.ID + ": " + String.valueOf(mId) + ", "
+            + BadgeColumns.PACKAGE + ": " + String.valueOf(mPackage) + ", "
+            + BadgeColumns.CLASS + ": " + String.valueOf(mClass) + ", "
+            + BadgeColumns.BADGE_COUNT + ": " + String.valueOf(mBadgeCount) + ", "
+            + "hasIcon: " + (mIcon != null ? "true" : "false");
     }
 
     @Override
