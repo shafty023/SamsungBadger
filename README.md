@@ -17,7 +17,6 @@ EXAMPLES
 **To return the Badge instance for your application:**
 
     Context context = getApplicationContext();
-    Badge badge = Badge.getBadge(context);
     if (Badge.isBadgingSupported(context)) {
         Badge badge = Badge.getBadge(context);
 
