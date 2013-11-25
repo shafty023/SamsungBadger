@@ -48,10 +48,20 @@ public final class Badge implements BadgeColumns, Parcelable {
         mBaseUri = CONTENT_URI;
     }
 
+    /**
+     * Determines if Badge instance has a valid id.
+     * 
+     * @return true if badge instance is saved, false otherwise.
+     */
     private boolean isSaved() {
         return mId <= 0;
     }
 
+    /**
+     * Restores a Badge instance from a Cursor.
+     * 
+     * @param c Cursor pointing to row in BadgeProvider
+     */
     private void restore(Cursor c) {
         mId = c.getLong(CONTENT_ID_COLUMN);
         mPackage = c.getString(CONTENT_PACKAGE_COLUMN);
@@ -60,6 +70,11 @@ public final class Badge implements BadgeColumns, Parcelable {
         mIcon = c.getBlob(CONTENT_ICON_COLUMN);
     }
 
+    /**
+     * Dumps the Badge instance to ContentValues.
+     * 
+     * @return The Badge instance as ContentValues
+     */
     private ContentValues toContentValues() {
         ContentValues cv = new ContentValues();
         cv.put(PACKAGE, mPackage);
