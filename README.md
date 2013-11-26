@@ -55,6 +55,40 @@ EXAMPLES
         }
     }
 
+**For debugging purposes if you want to log all badge records to log:**
+
+    Context context = getApplicationContext();
+    if (Badge.isBadgingSupported(context)) {
+        for (Badge b : Badge.getAllBadges(context)) {
+            Log.d("Badge", "Badge: " + b.toString());
+        }
+    }
+
+**To delete a single badge instance**
+
+    Context context = getApplicationContext();
+    if (Badge.isBadgingSupported(context)) {
+        Badge badge = Badge.getBadge(context);
+        if (badge != null) {
+            if (badge.delete(context)) {
+                Log.d("Badge", "Successfully deleted badge record");
+            } else {
+                Log.d("Badge", "Failed to delete badge record");
+            }
+        }
+    }
+
+**To delete all badge records registered with your app's package name:**
+
+    Context context = getApplicationContext();
+    if (Badge.isBadgingSupported(context)) {
+        if (Badge.delete(context)) {
+            Log.d("Badge", "Successfully deleted all badge records");
+        } else {
+            Log.d("Badge", "Failed to delete badge records");
+        }
+    }
+
 LICENSE
 =============
 
