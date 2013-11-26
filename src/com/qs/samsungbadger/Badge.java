@@ -267,7 +267,7 @@ public final class Badge implements BadgeColumns, Parcelable {
     }
 
     /**
-     * Deletes all Badge instances for this application's package name.
+     * Deletes the record of this Badge instance with the BadgeProvider.
      * 
      * <p>Throws {@link UnsupportedOperationException} if badging is not supported.<br><br>
      * 
@@ -281,7 +281,27 @@ public final class Badge implements BadgeColumns, Parcelable {
             throw new UnsupportedOperationException();
         }
 
-        final int rows = context.getContentResolver().delete(mBaseUri,
+        Uri uri = ContentUris.withAppendedId(mBaseUri, mId);
+        final int rows = context.getContentResolver().delete(uri, null, null);
+        return rows > 0;
+    }
+
+    /**
+     * Deletes all Badge instances for this application's package name.
+     * 
+     * <p>Throws {@link UnsupportedOperationException} if badging is not supported.<br><br>
+     * 
+     * <b>THIS OPERATION IS BLOCKING. DO NOT RUN ON UI THREAD.</b></p>
+     * 
+     * @param context
+     * @return
+     */
+    public static boolean deleteAllBadges(Context context) {
+        if (!isBadgingSupported(context)) {
+            throw new UnsupportedOperationException();
+        }
+
+        final int rows = context.getContentResolver().delete(CONTENT_URI,
             BadgeColumns.PACKAGE + "=?", new String[] {context.getPackageName()});
         return rows > 0;
     }
