@@ -2,6 +2,7 @@ package com.qs.samsungbadger;
 
 import java.io.ByteArrayOutputStream;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -149,6 +150,41 @@ public final class Badge implements BadgeColumns, Parcelable {
     }
 
     /**
+     * Returns all badge instances recorded with the BadgeProvider.
+     * 
+     * <p>Null is returned if badging is not supported or if no badges exist.<br><br>
+     * 
+     * <b>Should only be used for debugging purposes.</b></p>
+     * 
+     * @param context
+     * @return an array of all the badge instances or null if none are 
+     */
+    public static Badge[] getAllBadges(Context context) {
+        if (!isBadgingSupported(context)) return null;
+
+        Badge[] badges = null;
+        Cursor c = context.getContentResolver().query(CONTENT_URI,
+                CONTENT_PROJECTION, null, null, null);
+        try {
+            // No badges exist
+        	if (!c.moveToFirst()) {
+        	    return null;
+        	}
+
+        	badges = new Badge[c.getCount()];
+        	c.moveToPosition(-1);
+        	while (c.moveToNext()) {
+        	    Badge b = new Badge();
+        	    b.restore(c);
+        	    badges[c.getPosition()] = b;
+        	}
+        	return badges;
+        } finally {
+            c.close();
+        }
+    }
+
+    /**
      * Converts the icon byte array into a Bitmap.
      * 
      * @return the icon as a bitmap or null
@@ -224,8 +260,29 @@ public final class Badge implements BadgeColumns, Parcelable {
             throw new UnsupportedOperationException();
         }
 
-        final int rows = context.getContentResolver().update(mBaseUri,
-            toContentValues(), null, null);
+        Uri uri = ContentUris.withAppendedId(mBaseUri, mId);
+        final int rows = context.getContentResolver().update(uri, toContentValues(),
+                null, null);
+        return rows > 0;
+    }
+
+    /**
+     * Deletes all Badge instances for this application's package name.
+     * 
+     * <p>Throws {@link UnsupportedOperationException} if badging is not supported.<br><br>
+     * 
+     * <b>THIS OPERATION IS BLOCKING. DO NOT RUN ON UI THREAD.</b></p>
+     * 
+     * @param context
+     * @return
+     */
+    public boolean delete(Context context) {
+        if (!isBadgingSupported(context)) {
+            throw new UnsupportedOperationException();
+        }
+
+        final int rows = context.getContentResolver().delete(mBaseUri,
+            BadgeColumns.PACKAGE + "=?", new String[] {context.getPackageName()});
         return rows > 0;
     }
 
